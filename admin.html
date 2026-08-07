@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Reward Maximizer</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  
+  <!-- Login Overlay -->
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+      <h2>Admin Access</h2>
+      <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.9rem;">Please sign in to manage your credit cards.</p>
+      <button id="login-btn" class="login-btn">Log In with Netlify Identity</button>
+    </div>
+  </div>
+
+  <div class="glass-container hidden" id="admin-panel">
+    <header>
+      <h1>Manage Cards</h1>
+      <button id="logout-btn" class="btn-remove" style="border-color: var(--glass-border); color: var(--text-main);">Log Out</button>
+    </header>
+
+    <div style="flex: 1; padding: 24px; overflow-y: auto;">
+      <div class="admin-header">
+        <h2>Your Portfolio</h2>
+        <p>These cards will be analyzed by the AI when you ask for recommendations.</p>
+      </div>
+
+      <div id="card-list" class="card-list">
+        <!-- Cards injected here via JS -->
+      </div>
+
+      <form id="add-card-form" class="add-card-form">
+        <input type="text" id="new-card-input" placeholder="e.g., Chase Sapphire Reserve" required>
+        <button type="submit">Add Card</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
