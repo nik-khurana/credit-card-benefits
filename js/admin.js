@@ -1,5 +1,7 @@
 const loginOverlay = document.getElementById('login-overlay');
-const loginBtn = document.getElementById('login-btn');
+const loginForm = document.getElementById('login-form');
+const passcodeInput = document.getElementById('passcode-input');
+const loginError = document.getElementById('login-error');
 const adminPanel = document.getElementById('admin-panel');
 const logoutBtn = document.getElementById('logout-btn');
 const cardListEl = document.getElementById('card-list');
@@ -7,37 +9,32 @@ const addCardForm = document.getElementById('add-card-form');
 const newCardInput = document.getElementById('new-card-input');
 
 let cards = [];
+let currentPasscode = localStorage.getItem('admin_passcode') || '';
 
-if (window.netlifyIdentity) {
-  // Check on load
-  window.netlifyIdentity.on('init', user => {
-    if (user) {
-      showAdminPanel();
-    }
-  });
-  
-  window.netlifyIdentity.on('login', user => {
-    window.netlifyIdentity.close();
-    showAdminPanel();
-  });
-
-  window.netlifyIdentity.on('logout', () => {
-    showLoginOverlay();
-  });
+// Check if we already have a passcode on load
+if (currentPasscode) {
+  attemptLogin(currentPasscode);
 }
 
-loginBtn.addEventListener('click', () => {
-  window.netlifyIdentity.open();
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  const passcode = passcodeInput.value.trim();
+  if (passcode) {
+    await attemptLogin(passcode);
+  }
 });
 
 logoutBtn.addEventListener('click', () => {
-  window.netlifyIdentity.logout();
+  currentPasscode = '';
+  localStorage.removeItem('admin_passcode');
+  passcodeInput.value = '';
+  showLoginOverlay();
 });
 
 function showAdminPanel() {
   loginOverlay.classList.add('hidden');
   adminPanel.classList.remove('hidden');
-  fetchCards();
 }
 
 function showLoginOverlay() {
@@ -45,36 +42,44 @@ function showLoginOverlay() {
   adminPanel.classList.add('hidden');
 }
 
-async function fetchCards() {
-  cardListEl.innerHTML = '<p style="color:var(--text-muted)">Loading cards...</p>';
+async function attemptLogin(passcode) {
   try {
-    const user = window.netlifyIdentity.currentUser();
-    const token = await user.jwt();
-    
     const res = await fetch('/.netlify/functions/cards', {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': passcode
       }
     });
     
-    if (!res.ok) throw new Error("Failed to fetch");
-    const data = await res.json();
-    cards = data.cards || [];
-    renderCards();
+    if (res.ok) {
+      const data = await res.json();
+      cards = data.cards || [];
+      currentPasscode = passcode;
+      localStorage.setItem('admin_passcode', passcode);
+      renderCards();
+      showAdminPanel();
+    } else {
+      if (res.status === 401) {
+        throw new Error("Incorrect passcode.");
+      }
+      throw new Error("Failed to connect to server.");
+    }
   } catch (err) {
-    cardListEl.innerHTML = `<p style="color:var(--danger)">Error: ${err.message}</p>`;
+    currentPasscode = '';
+    localStorage.removeItem('admin_passcode');
+    loginError.textContent = err.message;
+    loginError.style.display = 'block';
+    showLoginOverlay();
   }
 }
 
 async function saveCards() {
-  const user = window.netlifyIdentity.currentUser();
-  const token = await user.jwt();
+  if (!currentPasscode) return;
   
   await fetch('/.netlify/functions/cards', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': currentPasscode
     },
     body: JSON.stringify({ cards })
   });

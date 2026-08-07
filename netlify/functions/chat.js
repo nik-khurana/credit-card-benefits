@@ -1,15 +1,6 @@
 const { getStore } = require("@netlify/blobs");
 
 exports.handler = async (event, context) => {
-  // 1. Verify Authentication
-  const user = context.clientContext && context.clientContext.user;
-  if (!user) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Unauthorized. Please log in." })
-    };
-  }
-
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
@@ -20,18 +11,25 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, body: JSON.stringify({ error: "Message is required" }) };
     }
 
-    // 2. Get User's Cards
-    const store = getStore("cards-store");
-    let cards = await store.get("portfolio", { type: "json" });
-    
-    // Fallback if none exist
-    if (!cards) {
-      cards = [
-        "Chase Freedom Unlimited", "Chase Freedom Flex", "Chase Sapphire Preferred",
-        "Chase Amazon Prime Visa", "Discover IT Card", "Apple Card",
-        "Bank of America Unlimited Rewards", "Bank of America Travel Rewards",
-        "Bilt Blue Card", "Amex Gold", "Amex Blue Cash Everyday"
-      ];
+    // Default Cards (Guaranteed to be present)
+    const defaultCards = [
+      "Chase Freedom Unlimited", "Chase Freedom Flex", "Chase Sapphire Preferred",
+      "Chase Amazon Prime Visa", "Discover IT Card", "Apple Card",
+      "Bank of America Unlimited Rewards", "Bank of America Travel Rewards",
+      "Bilt Blue Card", "Amex Gold", "Amex Blue Cash Everyday"
+    ];
+
+    let cards = defaultCards;
+
+    // Try to get user's modified list from Blobs
+    try {
+      const store = getStore("cards-store");
+      const storedCards = await store.get("portfolio", { type: "json" });
+      if (storedCards && Array.isArray(storedCards) && storedCards.length > 0) {
+        cards = storedCards;
+      }
+    } catch (e) {
+      console.warn("Could not fetch blobs, using default cards.", e);
     }
 
     const apiKey = process.env.NVIDIA_API_KEY;

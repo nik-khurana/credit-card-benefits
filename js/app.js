@@ -2,16 +2,6 @@ const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const userInput = document.getElementById('user-input');
 
-// Initialize Netlify Identity
-if (window.netlifyIdentity) {
-  window.netlifyIdentity.on("init", user => {
-    if (!user) {
-      appendMessage("ai", "Welcome! Please navigate to `/admin.html` to log in securely. The AI is locked to prevent unauthorized API usage.");
-      userInput.disabled = true;
-    }
-  });
-}
-
 function appendMessage(sender, text) {
   const msgDiv = document.createElement('div');
   msgDiv.classList.add('message', sender);
@@ -50,12 +40,6 @@ function removeTypingIndicator() {
 chatForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  const user = window.netlifyIdentity && window.netlifyIdentity.currentUser();
-  if (!user) {
-    appendMessage('ai', 'Error: You must be logged in to use the AI. Visit `/admin.html` to log in.');
-    return;
-  }
-
   const text = userInput.value.trim();
   if (!text) return;
 
@@ -66,28 +50,27 @@ chatForm.addEventListener('submit', async (e) => {
   showTypingIndicator();
 
   try {
-    const token = await user.jwt();
-    
-    // Call the Netlify Function
+    // Call the Netlify Function directly (publicly accessible now)
     const response = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ message: text })
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-         throw new Error("Unauthorized. Please log in again.");
-      }
       throw new Error(`Server responded with status ${response.status}`);
     }
 
     const data = await response.json();
     removeTypingIndicator();
-    appendMessage('ai', data.reply);
+    
+    if (data.reply) {
+      appendMessage('ai', data.reply);
+    } else if (data.error) {
+      appendMessage('ai', `Error: ${data.error}`);
+    }
     
   } catch (error) {
     removeTypingIndicator();

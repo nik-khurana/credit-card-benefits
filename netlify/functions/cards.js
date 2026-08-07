@@ -1,12 +1,13 @@
 const { getStore } = require("@netlify/blobs");
 
 exports.handler = async (event, context) => {
-  // Verify Netlify Identity Authentication
-  const user = context.clientContext && context.clientContext.user;
-  if (!user) {
+  const adminPasscode = process.env.ADMIN_PASSCODE || 'password123';
+  const providedPasscode = event.headers.authorization;
+
+  if (providedPasscode !== adminPasscode) {
     return {
       statusCode: 401,
-      body: JSON.stringify({ error: "Unauthorized. Please log in." })
+      body: JSON.stringify({ error: "Unauthorized. Incorrect passcode." })
     };
   }
 
@@ -14,7 +15,7 @@ exports.handler = async (event, context) => {
     // Initialize Blob store
     const store = getStore("cards-store");
     
-    // Fallback default cards if store is empty
+    // Fallback default cards
     const defaultCards = [
       "Chase Freedom Unlimited",
       "Chase Freedom Flex",
@@ -33,8 +34,6 @@ exports.handler = async (event, context) => {
       let cards = await store.get("portfolio", { type: "json" });
       if (!cards) {
         cards = defaultCards;
-        // Optionally save the defaults so they persist immediately
-        await store.setJSON("portfolio", cards);
       }
       return {
         statusCode: 200,
