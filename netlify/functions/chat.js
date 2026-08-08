@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
 The user has the following credit cards in their portfolio:
 ${cards.map(c => `- ${c}`).join("\n")}
 
-Your goal is to help them maximize their rewards. Answer their questions accurately based on the standard benefits, reward categories, and perks of these specific cards. Keep your answers concise, clear, and formatted in markdown. Focus ONLY on the cards they own unless they explicitly ask about a new card.`;
+Your goal is to help them maximize their rewards. Answer their questions accurately based on the standard benefits, reward categories, and perks of these specific cards. Keep your answers extremely concise, clear, and formatted in markdown. Do not write long paragraphs. Focus ONLY on the cards they own unless they explicitly ask about a new card.`;
 
     // 4. Call NVIDIA API
     const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
@@ -58,7 +58,7 @@ Your goal is to help them maximize their rewards. Answer their questions accurat
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
         ],
-        max_tokens: 1024,
+        max_tokens: 400,
         temperature: 0.2
       })
     });
