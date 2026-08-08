@@ -31,6 +31,9 @@ if (themeToggleBtn) {
 
 const chatContainer = document.getElementById('chat-container');
 const benefitsSelect = document.getElementById('benefits-select');
+const categorySelect = document.getElementById('category-select');
+
+let chatHistory = [];
 
 function getCardsList() {
   try {
@@ -73,6 +76,20 @@ if (benefitsSelect) {
       
       // Auto-populate chat and send
       userInput.value = `Please list all the detailed benefits and reward categories for my ${selectedCard}.`;
+      chatForm.dispatchEvent(new Event('submit'));
+    }
+  });
+}
+
+if (categorySelect) {
+  categorySelect.addEventListener('change', (e) => {
+    const selectedCategory = e.target.value;
+    if (selectedCategory) {
+      // Reset dropdown
+      categorySelect.value = '';
+      
+      // Auto-populate chat and send
+      userInput.value = `I am about to spend money on ${selectedCategory}. Which of my cards should I use to maximize rewards, and what is the reward rate?`;
       chatForm.dispatchEvent(new Event('submit'));
     }
   });
@@ -123,6 +140,8 @@ chatForm.addEventListener('submit', async (e) => {
   userInput.value = '';
   showTypingIndicator();
 
+  chatHistory.push({ role: 'user', content: text });
+  
   try {
     let savedCards = [];
     try {
@@ -134,7 +153,7 @@ chatForm.addEventListener('submit', async (e) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ message: text, cards: savedCards })
+      body: JSON.stringify({ messages: chatHistory, cards: savedCards })
     });
 
     if (!response.ok) {
@@ -145,12 +164,23 @@ chatForm.addEventListener('submit', async (e) => {
     removeTypingIndicator();
     
     if (data.reply) {
+      chatHistory.push({ role: 'assistant', content: data.reply });
+      
+      // Keep history from getting too large (last 10 messages)
+      if (chatHistory.length > 10) {
+        chatHistory = chatHistory.slice(chatHistory.length - 10);
+      }
+      
       appendMessage('ai', data.reply);
     } else if (data.error) {
+      // Revert the user message if there was an error
+      chatHistory.pop();
       appendMessage('ai', `Error: ${data.error}`);
     }
     
   } catch (error) {
+    // Revert the user message if there was a network error
+    chatHistory.pop();
     removeTypingIndicator();
     appendMessage('ai', `Sorry, an error occurred: ${error.message}`);
     console.error(error);
