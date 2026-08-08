@@ -23,9 +23,11 @@
 </head>
 <body>
   
-  <!-- Login Overlay -->
   <div id="login-overlay" class="login-overlay">
-    <div class="login-box">
+    <div class="login-box" style="position: relative;">
+      <button onclick="window.location.href='/'" style="position: absolute; top: 24px; left: 24px; background: transparent; color: var(--text-muted); border: none; cursor: pointer;" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      </button>
       <h2>Admin Access</h2>
       <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.9rem;">Please enter the passcode to manage your credit cards.</p>
       <form id="login-form">
@@ -38,7 +40,13 @@
 
   <div class="glass-container hidden" id="admin-panel">
     <header>
-      <h1>Manage Cards</h1>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <button onclick="window.location.href='/'" style="background: transparent; color: var(--text-main); border: 1px solid var(--glass-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Back
+        </button>
+        <h1 style="margin: 0; font-size: 1.25rem;">Manage Cards</h1>
+      </div>
       <button id="logout-btn" class="btn-remove" style="border-color: var(--glass-border); color: var(--text-main);">Lock</button>
     </header>
 

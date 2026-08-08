@@ -29,7 +29,7 @@ logoutBtn.addEventListener('click', () => {
   currentPasscode = '';
   localStorage.removeItem('admin_passcode');
   passcodeInput.value = '';
-  showLoginOverlay();
+  window.location.href = '/';
 });
 
 function showAdminPanel() {
