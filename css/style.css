@@ -1,9 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-color: #0f172a;
-  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  --glass-bg: rgba(30, 41, 59, 0.7);
+  --bg-gradient: linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
+  --glass-bg: rgba(10, 10, 10, 0.8);
   --glass-border: rgba(255, 255, 255, 0.1);
   --primary: #3b82f6;
   --primary-hover: #2563eb;
@@ -12,6 +11,18 @@
   --accent: #10b981;
   --accent-light: rgba(16, 185, 129, 0.2);
   --danger: #ef4444;
+  --msg-ai-bg: rgba(255, 255, 255, 0.05);
+  --input-bg: rgba(20, 20, 20, 0.8);
+}
+
+[data-theme="light"] {
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --msg-ai-bg: #ffffff;
+  --input-bg: #ffffff;
 }
 
 * {
@@ -144,7 +155,7 @@ header .status::before {
 }
 
 .message.ai {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--msg-ai-bg);
   border: 1px solid var(--glass-border);
   color: var(--text-main);
   align-self: flex-start;
@@ -182,7 +193,7 @@ header .status::before {
 
 .input-area input {
   flex: 1;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--input-bg);
   border: 1px solid var(--glass-border);
   border-radius: 100px;
   padding: 14px 20px;

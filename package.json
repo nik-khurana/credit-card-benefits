@@ -1,9 +1,0 @@
-{
-  "name": "credit-card-benefits",
-  "version": "1.0.0",
-  "description": "Credit Card Rewards Chat App",
-  "dependencies": {
-    "@netlify/blobs": "^7.3.0",
-    "node-fetch": "^3.3.2"
-  }
-}

@@ -43,46 +43,35 @@ function showLoginOverlay() {
 }
 
 async function attemptLogin(passcode) {
+  // Simple check: we don't have a backend to verify this anymore, so we trust it locally,
+  // but it's used to authenticate chat requests. If they enter a bad passcode,
+  // the chat backend will fail them with 401 anyway.
+  currentPasscode = passcode;
+  localStorage.setItem('admin_passcode', passcode);
+  
+  // Load cards from local storage
   try {
-    const res = await fetch('/.netlify/functions/cards', {
-      headers: {
-        'Authorization': passcode
-      }
-    });
-    
-    if (res.ok) {
-      const data = await res.json();
-      cards = data.cards || [];
-      currentPasscode = passcode;
-      localStorage.setItem('admin_passcode', passcode);
-      renderCards();
-      showAdminPanel();
-    } else {
-      if (res.status === 401) {
-        throw new Error("Incorrect passcode.");
-      }
-      throw new Error("Failed to connect to server.");
-    }
-  } catch (err) {
-    currentPasscode = '';
-    localStorage.removeItem('admin_passcode');
-    loginError.textContent = err.message;
-    loginError.style.display = 'block';
-    showLoginOverlay();
+    const saved = localStorage.getItem('user_cards');
+    if (saved) cards = JSON.parse(saved);
+  } catch(e) {}
+
+  if (cards.length === 0) {
+    cards = [
+      "Chase Freedom Unlimited", "Chase Freedom Flex", "Chase Sapphire Preferred",
+      "Chase Amazon Prime Visa", "Discover IT Card", "Apple Card",
+      "Bank of America Unlimited Rewards", "Bank of America Travel Rewards",
+      "Bilt Blue Card", "Amex Gold", "Amex Blue Cash Everyday"
+    ];
+    await saveCards();
   }
+
+  renderCards();
+  showAdminPanel();
 }
 
 async function saveCards() {
   if (!currentPasscode) return;
-  
-  await fetch('/.netlify/functions/cards', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': currentPasscode
-    },
-    body: JSON.stringify({ cards })
-  });
+  localStorage.setItem('user_cards', JSON.stringify(cards));
 }
 
 function renderCards() {

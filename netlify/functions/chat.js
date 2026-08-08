@@ -1,12 +1,10 @@
-const { getStore } = require("@netlify/blobs");
-
 exports.handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
   try {
-    const { message } = JSON.parse(event.body);
+    const { message, cards: userCards } = JSON.parse(event.body);
     if (!message) {
       return { statusCode: 400, body: JSON.stringify({ error: "Message is required" }) };
     }
@@ -19,18 +17,7 @@ exports.handler = async (event, context) => {
       "Bilt Blue Card", "Amex Gold", "Amex Blue Cash Everyday"
     ];
 
-    let cards = defaultCards;
-
-    // Try to get user's modified list from Blobs
-    try {
-      const store = getStore("cards-store");
-      const storedCards = await store.get("portfolio", { type: "json" });
-      if (storedCards && Array.isArray(storedCards) && storedCards.length > 0) {
-        cards = storedCards;
-      }
-    } catch (e) {
-      console.warn("Could not fetch blobs, using default cards.", e);
-    }
+    const cards = (userCards && Array.isArray(userCards) && userCards.length > 0) ? userCards : defaultCards;
 
     const apiKey = process.env.NVIDIA_API_KEY;
     if (!apiKey) {
