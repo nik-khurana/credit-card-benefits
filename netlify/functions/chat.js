@@ -41,15 +41,22 @@ exports.handler = async (event, context) => {
        };
     }
 
+    const adminPasscode = process.env.ADMIN_PASSCODE || 'password123';
+    const providedPasscode = event.headers.authorization;
+
+    if (providedPasscode !== adminPasscode) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ error: "Unauthorized. Incorrect passcode." })
+      };
+    }
+
     // 3. Construct the Prompt
     const systemPrompt = `You are a highly knowledgeable credit card rewards expert. 
 The user has the following credit cards in their portfolio:
 ${cards.map(c => `- ${c}`).join("\n")}
 
 Your goal is to help them maximize their rewards. Answer their questions accurately based on the standard benefits, reward categories, and perks of these specific cards. Keep your answers concise, clear, and formatted in markdown. Focus ONLY on the cards they own unless they explicitly ask about a new card.`;
-
-    // Because node-fetch is v3+, we have to dynamically import it if using CommonJS
-    const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
     // 4. Call NVIDIA API
     const response = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
