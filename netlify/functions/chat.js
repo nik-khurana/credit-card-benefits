@@ -53,12 +53,12 @@ Your goal is to help them maximize their rewards. Answer their questions accurat
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "meta/llama-3.3-70b-instruct",
+        model: "meta/llama-3.1-8b-instruct",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
         ],
-        max_tokens: 400,
+        max_tokens: 500,
         temperature: 0.2
       })
     });
