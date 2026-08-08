@@ -8,20 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-  <!-- Passcode Overlay -->
-  <div id="login-overlay" class="login-overlay">
-    <div class="login-box">
-      <h2>Reward Maximizer</h2>
-      <p style="margin-bottom: 24px; color: var(--text-muted); font-size: 0.9rem;">Please enter your passcode to access the AI.</p>
-      <form id="login-form">
-        <input type="password" id="passcode-input" class="passcode-input" style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 8px; padding: 12px 16px; color: white; outline: none; margin-bottom: 16px;" placeholder="Enter Passcode" required>
-        <button type="submit" class="login-btn" style="width: 100%; background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer;">Unlock</button>
-      </form>
-      <p id="login-error" style="color: var(--danger); font-size: 0.85rem; margin-top: 12px; display: none;"></p>
-    </div>
-  </div>
-
-  <div class="glass-container hidden" id="chat-container">
+  <div class="glass-container" id="chat-container">
     <header>
       <h1>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

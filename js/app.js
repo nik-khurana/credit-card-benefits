@@ -29,14 +29,7 @@ if (themeToggleBtn) {
   });
 }
 
-// Passcode logic
-const loginOverlay = document.getElementById('login-overlay');
-const loginForm = document.getElementById('login-form');
-const passcodeInput = document.getElementById('passcode-input');
-const loginError = document.getElementById('login-error');
 const chatContainer = document.getElementById('chat-container');
-
-let currentPasscode = localStorage.getItem('admin_passcode') || '';
 const benefitsSelect = document.getElementById('benefits-select');
 
 function getCardsList() {
@@ -68,25 +61,8 @@ function populateBenefitsDropdown() {
   });
 }
 
-if (currentPasscode) {
-  unlockChat();
-}
-
-loginForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const passcode = passcodeInput.value.trim();
-  if (passcode) {
-    currentPasscode = passcode;
-    localStorage.setItem('admin_passcode', passcode);
-    unlockChat();
-  }
-});
-
-function unlockChat() {
-  loginOverlay.classList.add('hidden');
-  chatContainer.classList.remove('hidden');
-  populateBenefitsDropdown();
-}
+// Initialize dropdown
+populateBenefitsDropdown();
 
 if (benefitsSelect) {
   benefitsSelect.addEventListener('change', (e) => {
@@ -102,13 +78,6 @@ if (benefitsSelect) {
   });
 }
 
-function lockChat() {
-  currentPasscode = '';
-  localStorage.removeItem('admin_passcode');
-  passcodeInput.value = '';
-  loginOverlay.classList.remove('hidden');
-  chatContainer.classList.add('hidden');
-}
 
 function appendMessage(sender, text) {
   const msgDiv = document.createElement('div');
@@ -163,19 +132,12 @@ chatForm.addEventListener('submit', async (e) => {
     const response = await fetch('/.netlify/functions/chat', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': currentPasscode
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ message: text, cards: savedCards })
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        lockChat();
-        loginError.textContent = "Incorrect passcode.";
-        loginError.style.display = 'block';
-        throw new Error("Unauthorized. Incorrect passcode.");
-      }
       throw new Error(`Server responded with status ${response.status}`);
     }
 

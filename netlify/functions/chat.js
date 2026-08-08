@@ -28,16 +28,6 @@ exports.handler = async (event, context) => {
        };
     }
 
-    const adminPasscode = process.env.ADMIN_PASSCODE || 'password123';
-    const providedPasscode = event.headers.authorization;
-
-    if (providedPasscode !== adminPasscode) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ error: "Unauthorized. Incorrect passcode." })
-      };
-    }
-
     // 3. Construct the Prompt
     const systemPrompt = `You are a highly knowledgeable credit card rewards expert. 
 The user has the following credit cards in their portfolio:
